@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chat-system-app
+  namespace: chat-system
+  labels:
+    app: chat-system-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: chat-system-app
+  template:
+    metadata:
+      labels:
+        app: chat-system-app
+    spec:
+      containers:
+        - name: chat-system
+          image: your-registry/chat-system:latest # TODO: replace with your image
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - configMapRef:
+                name: chat-system-config
+            - secretRef:
+                name: chat-system-secret

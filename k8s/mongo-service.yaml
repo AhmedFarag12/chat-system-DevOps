@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: chat-system-mongo
+  namespace: chat-system
+  labels:
+    app: chat-system-mongo
+spec:
+  selector:
+    app: chat-system-mongo
+  ports:
+    - port: 27017
+      targetPort: 27017

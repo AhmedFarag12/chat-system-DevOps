@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: chat-system-config
+  namespace: chat-system
+data:
+  PORT: "3000"
+  JWT_EXPIRES_IN: "7d"
+  REDIS_URL: "redis://chat-system-redis:6379"

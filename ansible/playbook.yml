@@ -1,0 +1,44 @@
+---
+- name: Setup server and deploy chat-system
+  hosts: chat_servers
+  become: true
+
+  vars:
+    app_dir: /opt/chat-system
+    repo_url: https://github.com/AhmedFarag12/chat-system-nest.git
+
+  tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+
+    - name: Install Docker and dependencies
+      ansible.builtin.apt:
+        name:
+          - docker.io
+          - docker-compose-v2
+          - git
+        state: present
+
+    - name: Make sure Docker is running
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Clone/update the app repo
+      ansible.builtin.git:
+        repo: "{{ repo_url }}"
+        dest: "{{ app_dir }}"
+        force: true
+
+    - name: Copy .env file to server
+      ansible.builtin.copy:
+        src: ../.env
+        dest: "{{ app_dir }}/.env"
+        mode: '0600'
+
+    - name: Start the app with docker compose
+      ansible.builtin.command:
+        cmd: docker compose up -d --build
+        chdir: "{{ app_dir }}"

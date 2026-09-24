@@ -36,3 +36,25 @@ Server -> client: `message:new`, `typing`, `message:read`, `presence` `{userId, 
 ## Redis usage
 - Presence: per-user socket counter (`presence:<userId>`), so multiple tabs work.
 - `@socket.io/redis-adapter`: events fan out across multiple server instances.
+
+## Monitoring (Prometheus + Grafana)
+
+The app exposes Node.js process metrics at `GET /metrics`.
+
+- **Docker Compose:** `docker compose up -d` → Prometheus on http://localhost:9090, Grafana on http://localhost:3001 (`admin` / `admin`). The Prometheus data source is already added.
+- **Kubernetes:** `kubectl apply -f k8s/monitoring/`, then
+  `kubectl -n chat-system port-forward svc/grafana 3001:3000` (and `svc/prometheus 9090` for Prometheus).
+- Quick start dashboard: in Grafana, *Dashboards → New → Import* and enter ID `11159` (Node.js Application Dashboard).
+
+## AWS (Terraform)
+
+`terraform/` creates one Ubuntu EC2 server (+ security group for ports 22, 3000, 3001, 9090 and an SSH key pair).
+
+```bash
+cd terraform
+terraform init
+terraform apply        # prints public_ip
+```
+
+Put the IP in `ansible/hosts.ini` (`ansible_host=<public_ip> ansible_user=ubuntu`), then run the playbook to deploy.
+`terraform destroy` removes everything.
